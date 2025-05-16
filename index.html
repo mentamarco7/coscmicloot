@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cosmic Loot - Mystery Box Opener</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@400;700&family=Bungee&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-pink: #ff2a6d;
+            --neon-blue: #05d9e8;
+            --neon-purple: #d300c5;
+            --neon-green: #00ff9d;
+            --neon-yellow: #ffe700;
+        }
+        
+        body {
+            font-family: 'Orbitron', sans-serif;
+            background-color: #0a0a1a;
+            color: white;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+        
+        .title-font {
+            font-family: 'Bungee', cursive;
+            text-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue);
+        }
+        
+        .pixel-font {
+            font-family: 'Press Start 2P', cursive;
+        }
+        
+        .neon-pink {
+            color: var(--neon-pink);
+            text-shadow: 0 0 5px var(--neon-pink), 0 0 15px var(--neon-pink);
+        }
+        
+        .neon-blue {
+            color: var(--neon-blue);
+            text-shadow: 0 0 5px var(--neon-blue), 0 0 15px var(--neon-blue);
+        }
+        
+        .neon-purple {
+            color: var(--neon-purple);
+            text-shadow: 0 0 5px var(--neon-purple), 0 0 15px var(--neon-purple);
+        }
+        
+        .neon-green {
+            color: var(--neon-green);
+            text-shadow: 0 0 5px var(--neon-green), 0 0 15px var(--neon-green);
+        }
+        
+        .neon-yellow {
+            color: var(--neon-yellow);
+            text-shadow: 0 0 5px var(--neon-yellow), 0 0 15px var(--neon-yellow);
+        }
+        
+        .glow-box {
+            box-shadow: 0 0 15px 5px rgba(5, 217, 232, 0.5);
+            transition: all 0.3s ease;
+        }
+        
+        .glow-box:hover {
+            box-shadow: 0 0 25px 10px rgba(5, 217, 232, 0.7);
+            transform: translateY(-5px);
+        }
+        
+        .box-opening {
+            animation: pulse 0.5s infinite alternate;
+        }
+        
+        @keyframes pulse {
+            from {
+                transform: scale(1);
+                box-shadow: 0 0 10px 5px rgba(255, 42, 109, 0.5);
+            }
+            to {
+                transform: scale(1.05);
+                box-shadow: 0 0 25px 15px rgba(255, 42, 109, 0.8);
+            }
+        }
+        
+        .sparkle {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background-color: white;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: sparkle-fall 1s linear forwards;
+        }
+        
+        @keyframes sparkle-fall {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--tx, 0), 100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        .inventory-item {
+            transition: all 0.3s ease;
+        }
+        
+        .inventory-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px 5px rgba(255, 255, 255, 0.3);
+        }
+        
+        .rainbow-text {
+            background: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: rainbow 5s ease infinite;
+        }
+        
+        @keyframes rainbow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .hacker-text {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hacker-text::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(transparent 0%, rgba(0, 255, 0, 0.1) 50%, transparent 100%;
+            animation: hacker 2s linear infinite;
+        }
+        
+        @keyframes hacker {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+        
+        .box-common {
+            border: 3px solid #ccc;
+            background: linear-gradient(135deg, #333, #666);
+        }
+        
+        .box-rare {
+            border: 3px solid #2a9df4;
+            background: linear-gradient(135deg, #1a3a8f, #2a9df4);
+        }
+        
+        .box-epic {
+            border: 3px solid #9b30ff;
+            background: linear-gradient(135deg, #5d0a8f, #9b30ff);
+        }
+        
+        .box-legendary {
+            border: 3px solid #ffd700;
+            background: linear-gradient(135deg, #b8860b, #ffd700);
+        }
+        
+        .box-cursed {
+            border: 3px solid #ff0000;
+            background: linear-gradient(135deg, #8b0000, #ff0000);
+        }
+        
+        .box-rainbow {
+            border: 3px solid white;
+            background: linear-gradient(135deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
+            background-size: 400% 400%;
+            animation: rainbow 5s ease infinite;
+        }
+        
+        .box-hacker {
+            border: 3px solid #00ff00;
+            background: linear-gradient(135deg, #003300, #006600);
+        }
+        
+        .reveal-animation {
+            animation: reveal 1s ease-out forwards;
+        }
+        
+        @keyframes reveal {
+            0% {
+                transform: scale(0.5) rotate(-30deg);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.2) rotate(10deg);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1) rotate(0deg);
+            }
+        }
+        
+        .coin-animation {
+            animation: coin-jump 0.5s ease-out;
+        }
+        
+        @keyframes coin-jump {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.2) translateY(-20px);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .collection-category {
+            transition: all 0.3s ease;
+        }
+        
+        .collection-category:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+    <!-- Audio Elements -->
+    <audio id="coinSound" src="https://assets.mixkit.co/sfx/preview/mixkit-coins-handling-1939.mp3" preload="auto"></audio>
+    <audio id="boxOpenSound" src="https://assets.mixkit.co/sfx/preview/mixkit-achievement-bell-600.mp3" preload="auto"></audio>
+    <audio id="rareSound" src="https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3" preload="auto"></audio>
+    <audio id="epicSound" src="https://assets.mixkit.co/sfx/preview/mixkit-magic-sparkle-902.mp3" preload="auto"></audio>
+    <audio id="legendarySound" src="https://assets.mixkit.co/sfx/preview/mixkit-unlock-game-notification-253.mp3" preload="auto"></audio>
+    <audio id="cursedSound" src="https://assets.mixkit.co/sfx/preview/mixkit-creepy-horror-scream-289.mp3" preload="auto"></audio>
+    <audio id="rainbowSound" src="https://assets.mixkit.co/sfx/preview/mixkit-fairy-magic-sparkle-914.mp3" preload="auto"></audio>
+    <audio id="hackerSound" src="https://assets.mixkit.co/sfx/preview/mixkit-computer-interface-urgent-notification-237.mp3" preload="auto"></audio>
+    
+    <!-- Main Container -->
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <!-- Header -->
+        <header class="text-center mb-12">
+            <h1 class="text-5xl md:text-6xl font-bold mb-4 title-font rainbow-text">COSMIC LOOT</h1>
+            <p class="text-xl neon-blue">Unleash the mystery! Collect the weirdest items in the universe!</p>
+        </header>
+        
+        <!-- Stats Bar -->
+        <div class="flex justify-between items-center mb-8 p-4 bg-gray-800 rounded-lg glow-box">
+            <div class="flex items-center">
+                <div class="mr-4">
+                    <span class="text-sm neon-green">COINS</span>
+                    <div class="flex items-center">
+                        <i class="fas fa-coins text-yellow-400 mr-2 text-xl"></i>
+                        <span id="coinCount" class="text-2xl font-bold neon-yellow">100</span>
+                    </div>
+                </div>
+                <div>
+                    <span class="text-sm neon-pink">ITEMS</span>
+                    <div class="flex items-center">
+                        <i class="fas fa-box-open text-purple-400 mr-2 text-xl"></i>
+                        <span id="itemCount" class="text-2xl font-bold neon-purple">0</span>
+                    </div>
+                </div>
+            </div>
+            <button id="earnCoinsBtn" class="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-3 px-6 rounded-full flex items-center transition-all duration-300 transform hover:scale-105">
+                <i class="fas fa-hand-holding-usd mr-2"></i> EARN COINS
+            </button>
+        </div>
+        
+        <!-- Tabs -->
+        <div class="flex border-b border-gray-700 mb-8">
+            <button class="tab-btn active px-6 py-3 font-bold neon-blue border-b-2 border-blue-400" data-tab="shop">SHOP</button>
+            <button class="tab-btn px-6 py-3 font-bold neon-green" data-tab="inventory">INVENTORY</button>
+            <button class="tab-btn px-6 py-3 font-bold neon-yellow" data-tab="collection">COLLECTION</button>
+        </div>
+        
+        <!-- Shop Tab -->
+        <div id="shop" class="tab-content active">
+            <h2 class="text-3xl font-bold mb-6 neon-blue text-center">MYSTERY BOX SHOP</h2>
+            <p class="text-center mb-8 neon-pink">Buy boxes and discover amazing (and weird) items!</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Common Box -->
+                <div class="box-common rounded-lg p-6 text-center glow-box hover:shadow-lg transition-all duration-300">
+                    <div class="box-common w-24 h-24 mx-auto mb-4 flex items-center justify-center text-4xl">
+                        <i class="fas fa-box"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Common Box</h3>
+                    <p class="text-gray-300 mb-4">Contains everyday weirdness</p>
+                    <div class="flex justify-center items-center mb-4">
+                        <i class="fas fa-coins text-yellow-400 mr-2"></i>
+                        <span class="font-bold">50</span>
+                    </div>
+                    <button class="buy-box-btn bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-full w-full" data-type="common" data-price="50">
+                        BUY NOW
+                    </button>
+                </div>
+                
+                <!-- Rare Box -->
+                <div class="box-rare rounded-lg p-6 text-center glow-box hover:shadow-lg transition-all duration-300">
+                    <div class="box-rare w-24 h-24 mx-auto mb-4 flex items-center justify-center text-4xl">
+                        <i class="fas fa-gem"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2 neon-blue">Rare Box</h3>
+                    <p class="text-gray-300 mb-4">Shiny and valuable finds</p>
+                    <div class="flex justify-center items-center mb-4">
+                        <i class="fas fa-coins text-yellow-400 mr-2"></i>
+                        <span class="font-bold">200</span>
+                    </div>
+                    <button class="buy-box-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full w-full" data-type="rare" data-price="200">
+                        BUY NOW
+                    </button>
+                </div>
+                
+                <!-- Epic Box -->
+                <div class="box-epic rounded-lg p-6 text-center glow-box hover:shadow-lg transition-all duration-300">
+                    <div class="box-epic w-24 h-24 mx-auto mb-4 flex items-center justify-center text-4xl">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2 neon-purple">Epic Box</h3>
+                    <p class="text-gray-300 mb-4">Legendary items await</p>
+                    <div class="flex justify-center items-center mb-4">
+                        <i class="fas fa-coins text-yellow-400 mr-2"></i>
+                        <span class="font-bold">500</span>
+                    </div>
+                    <button class="buy-box-btn bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-full w-full" data-type="epic" data-price="500">
+                        BUY NOW
+                    </button>
+                </div>
+                
+                <!-- Legendary Box -->
+                <div class="box-legendary rounded-lg p-6 text-center glow-box hover:shadow-lg transition-all duration-300">
+                    <div class="box-legendary w-24 h-24 mx-auto mb-4 flex items-center justify-center text-4xl">
+                        <i class="fas fa-crown"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2 neon-yellow">Legendary Box</h3>
+                    <p class="text-gray-300 mb-4">Mythical treasures inside</p>
+                    <div class="flex justify-center items-center mb-4">
+                        <i class="fas fa-coins text-yellow-400 mr-2"></i>
+                        <span class="font-bold">1000</span>
+                    </div>
+                    <button class="buy-box-btn bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-full w-full" data-type="legendary" data-price="1000">
+                        BUY NOW
+                    </button>
+                </div>
+                
+                <!-- Cursed Box -->
+                <div class="box-cursed rounded-lg p-6 text-center glow-box hover:shadow-lg transition-all duration-300">
+                    <div class="box-cursed w-24 h-24 mx-auto mb-4 flex items-center justify-center text-4xl">
+                        <i class="fas fa-skull"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2 neon-pink">Cursed Box</h3>
+                    <p class="text-gray-300 mb-4">Dangerously weird items</p>
+                    <div class="flex justify-center items-center mb-4">
+                        <i class="fas fa-coins text-yellow-400 mr-2"></i>
+                        <span class="font-bold">750</span>
+                    </div>
+                    <button class="buy-box-btn bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full w-full" data-type="cursed" data-price="750">
+                        BUY NOW
+                    </button>
+                </div>
+                
+                <!-- Rainbow Box -->
+                <div class="box-rainbow rounded-lg p-6 text-center glow-box hover:shadow-lg transition-all duration-300">
+                    <div class="box-rainbow w-24 h-24 mx-auto mb-4 flex items-center justify-center text-4xl">
+                        <i class="fas fa-rainbow"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2 rainbow-text">Rainbow Box</h3>
+                    <p class="text-gray-300 mb-4">Colorful cosmic surprises</p>
+                    <div class="flex justify-center items-center mb-4">
+                        <i class="fas fa-coins text-yellow-400 mr-2"></i>
+                        <span class="font-bold">1500</span>
+                    </div>
+                    <button class="buy-box-btn rainbow-text bg-black font-bold py-2 px-4 rounded-full w-full border border-white" data-type="rainbow" data-price="1500">
+                        BUY NOW
+                    </button>
+                </div>
+                
+                <!-- Hacker Box -->
+                <div class="box-hacker rounded-lg p-6 text-center glow-box hover:shadow-lg transition-all duration-300">
+                    <div class="box-hacker w-24 h-24 mx-auto mb-4 flex items-center justify-center text-4xl">
+                        <i class="fas fa-terminal"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2 neon-green hacker-text">Hacker Box</h3>
+                    <p class="text-gray-300 mb-4">Glitchy digital artifacts</p>
+                    <div class="flex justify-center items-center mb-4">
+                        <i class="fas fa-coins text-yellow-400 mr-2"></i>
+                        <span class="font-bold">2000</span>
+                    </div>
+                    <button class="buy-box-btn bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-full w-full" data-type="hacker" data-price="2000">
+                        BUY NOW
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Inventory Tab -->
+        <div id="inventory" class="tab-content">
+            <h2 class="text-3xl font-bold mb-6 neon-green text-center">YOUR INVENTORY</h2>
+            <p class="text-center mb-8 neon-blue">All your weird and wonderful treasures</p>
+            
+            <div class="flex justify-between items-center mb-6">
+                <div class="relative">
+                    <select id="filterType" class="bg-gray-800 border border-gray-700 text-white px-4 py-2 pr-8 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="all">All Items</option>
+                        <option value="common">Common</option>
+                        <option value="rare">Rare</option>
+                        <option value="epic">Epic</option>
+                        <option value="legendary">Legendary</option>
+                        <option value="cursed">Cursed</option>
+                        <option value="rainbow">Rainbow</option>
+                        <option value="hacker">Hacker</option>
+                    </select>
+                    <i class="fas fa-chevron-down absolute right-3 top-3 text-gray-400"></i>
+                </div>
+                <div class="relative">
+                    <input type="text" id="searchItem" placeholder="Search items..." class="bg-gray-800 border border-gray-700 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-64">
+                    <i class="fas fa-search absolute right-3 top-3 text-gray-400"></i>
+                </div>
+            </div>
+            
+            <div id="inventoryItems" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <!-- Items will be dynamically added here -->
+            </div>
+        </div>
+        
+        <!-- Collection Tab -->
+        <div id="collection" class="tab-content">
+            <h2 class="text-3xl font-bold mb-6 neon-yellow text-center">ITEM COLLECTION</h2>
+            <p class="text-center mb-8 neon-pink">Discover all the weird items in the universe!</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Collection categories will be dynamically added here -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Box Opening Modal -->
+    <div id="boxModal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 hidden">
+        <div class="bg-gray-900 rounded-lg p-8 max-w-md w-full relative border-2 border-blue-500">
+            <button id="closeModal" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+                <i class="fas fa-times text-2xl"></i>
+            </button>
+            
+            <div id="boxContent" class="text-center">
+                <div id="boxAnimation" class="w-32 h-32 mx-auto mb-6 flex items-center justify-center text-6xl box-opening">
+                    <i class="fas fa-box"></i>
+                </div>
+                <h3 id="boxTitle" class="text-2xl font-bold mb-4">Opening Box...</h3>
+                <div id="boxResult" class="text-xl font-bold mb-6 hidden">
+                    You found: <span id="itemName" class="text-3xl"></span>
+                </div>
+                <div id="boxRarity" class="text-lg mb-6 hidden"></div>
+                <div id="boxDescription" class="text-gray-300 mb-6 hidden"></div>
+                <button id="openAnotherBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-full hidden">
+                    OPEN ANOTHER
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Game State
+        const gameState = {
+            coins: 100,
+            inventory: [],
+            items: {
+                common: [
+                    { name: "Banana Sword", description: "A sword that's actually a banana. Surprisingly effective.", emoji: "🍌⚔️" },
+                    { name: "Rubber Chicken", description: "The classic comedy weapon. Squeeze it for maximum effect.", emoji: "🐔" },
+                    { name: "Invisible Hat", description: "You can't see it, but it's definitely there. Trust us.", emoji: "👒" },
+                    { name: "Sock Puppet", description: "Comes to life when you're not looking.", emoji: "🧦" },
+                    { name: "Bubble Wand", description: "Creates bubbles that never pop. Ever.", emoji: "🌀" }
+                ],
+                rare: [
+                    { name: "Glow-in-the-Dark Toenails", description: "They glow. They're toenails. What more do you want?", emoji: "💅✨" },
+                    { name: "Singing Potato", description: "It's a potato. It sings. Mostly show tunes.", emoji: "🥔🎶" },
+                    { name: "Flying Carpet (Small)", description: "Only flies about 3 inches off the ground. Perfect for avoiding puddles.", emoji: "🧞‍♂️" },
+                    { name: "Reverse Microwave", description: "Cools your food instantly. Also makes it slightly soggy.", emoji: "🍕❄️" },
+                    { name: "Teleporting Sock", description: "One sock always disappears. This one reappears somewhere random.", emoji: "🧦✨" }
+                ],
+                epic: [
+                    { name: "Time-Traveling Alarm Clock", description: "Goes off 5 minutes before you set it. Still can't wake you up.", emoji: "⏰🌀" },
+                    { name: "Unicorn Horn", description: "Makes you 17% more magical. 83% more likely to get strange looks.", emoji: "🦄✨" },
+                    { name: "Dragon's Breath Hot Sauce", description: "Literally breathes fire when you open it. Handle with care.", emoji: "🐉🔥" },
+                    { name: "Infinite Pizza Box", description: "Always has one more slice. Unfortunately, it's always pineapple.", emoji: "🍕∞" },
+                    { name: "Self-Writing Diary", description: "Writes your thoughts before you think them. Often embarrassing.", emoji: "📖✍️" }
+                ],
+                legendary: [
+                    { name: "The Meaning of Life", description: "It's 42. We checked.", emoji: "🤯" },
+                    { name: "God's Remote Control", description: "All buttons are disabled except 'Mute Preacher'.", emoji: "📱🙏" },
+                    { name: "Fountain of Youth Water", description: "Turns you into a teenager again. Side effects may include acne and poor decisions.", emoji: "⛲👶" },
+                    { name: "Original Idea", description: "The only one in existence. Handle with care.", emoji: "💡" },
+                    { name: "Wish-Granting Lamp", description: "Grants 3 wishes. All come with ironic twists.", emoji: "🧞‍♂️" }
+                ],
+                cursed: [
+                    { name: "Annoying Mosquito", description: "Never leaves you alone. Even in winter.", emoji: "🦟" },
+                    { name: "Itchy Sweater", description: "The itch moves when you scratch it.", emoji: "🧥" },
+                    { name: "Never-Ending Hiccups", description: "Comes in a jar. Open at your own risk.", emoji: "🤢" },
+                    { name: "Slow Internet Crystal", description: "Makes any WiFi connection unbearably slow within 10ft.", emoji: "📶🐢" },
+                    { name: "Deja Vu Coin", description: "Feel like you've seen this item before...", emoji: "🪙" }
+                ],
+                rainbow: [
+                    { name: "Double Rainbow", description: "All the way across the sky! What does it mean?", emoji: "🌈🌈" },
+                    { name: "Leprechaun's Gold", description: "Tastes like marshmallows. Disappears at midnight.", emoji: "🍀" },
+                    { name: "Mermaid's Hairbrush", description: "Gives you perfect beach waves. Also makes you sing occasionally.", emoji: "🧜‍♀️" },
+                    { name: "Pegasus Feather", description: "Makes you 10% lighter. 90% more likely to trip over nothing.", emoji: "🦄" },
+                    { name: "Fairy Dust", description: "Makes you sparkle. Also highly flammable.", emoji: "✨" }
+                ],
+                hacker: [
+                    { name: "1337 Keyboard", description: "Types in leetspeak automatically. Cannot be disabled.", emoji: "⌨️" },
+                    { name: "Infinite Loop", description: "A literal loop that never ends. Great for parties.", emoji: "➰" },
+                    { name: "Bitcoin Miner", description: "Mines 0.0000001 Bitcoin per year. Uses $500 in electricity.", emoji: "💰" },
+                    { name: "Blue Screen of Death", description: "Framed and mounted. Perfect for your office.", emoji: "💻" },
+                    { name: "404 Error", description: "Item not found.", emoji: "❓" }
+                ]
+            }
+        };
+
+        // DOM Elements
+        const coinCountEl = document.getElementById('coinCount');
+        const itemCountEl = document.getElementById('itemCount');
+        const earnCoinsBtn = document.getElementById('earnCoinsBtn');
+        const inventoryItemsEl = document.getElementById('inventoryItems');
+        const boxModal = document.getElementById('boxModal');
+        const closeModal = document.getElementById('closeModal');
+        const boxAnimation = document.getElementById('boxAnimation');
+        const boxTitle = document.getElementById('boxTitle');
+        const itemName = document.getElementById('itemName');
+        const boxRarity = document.getElementById('boxRarity');
+        const boxDescription = document.getElementById('boxDescription');
+        const openAnotherBtn = document.getElementById('openAnotherBtn');
+        const boxResult = document.getElementById('boxResult');
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const buyBoxButtons = document.querySelectorAll('.buy-box-btn');
+
+        // Audio Elements
+        const coinSound = document.getElementById('coinSound');
+        const boxOpenSound = document.getElementById('boxOpenSound');
+        const rareSound = document.getElementById('rareSound');
+        const epicSound = document.getElementById('epicSound');
+        const legendarySound = document.getElementById('legendarySound');
+        const cursedSound = document.getElementById('cursedSound');
+        const rainbowSound = document.getElementById('rainbowSound');
+        const hackerSound = document.getElementById('hackerSound');
+
+        // Initialize game
+        function initGame() {
+            updateCoinDisplay();
+            updateItemCount();
+            setupEventListeners();
+        }
+
+        // Set up event listeners
+        function setupEventListeners() {
+            // Earn coins button
+            earnCoinsBtn.addEventListener('click', earnCoins);
+
+            // Tab switching
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabId = button.getAttribute('data-tab');
+                    switchTab(tabId);
+                });
+            });
+
+            // Buy box buttons
+            buyBoxButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const boxType = button.getAttribute('data-type');
+                    const boxPrice = parseInt(button.getAttribute('data-price'));
+                    buyBox(boxType, boxPrice);
+                });
+            });
+
+            // Modal close button
+            closeModal.addEventListener('click', closeBoxModal);
+            openAnotherBtn.addEventListener('click', () => {
+                closeBoxModal();
+                document.getElementById('shop').classList.add('active');
+                switchTab('shop');
+            });
+        }
+
+        // Earn coins function
+        function earnCoins() {
+            gameState.coins += 12;
+            updateCoinDisplay();
+            coinSound.currentTime = 0;
+            coinSound.play();
+            
+            // Create coin animation
+            const coin = document.createElement('div');
+            coin.innerHTML = '<i class="fas fa-coins text-yellow-400"></i>';
+            coin.className = 'absolute text-2xl coin-animation';
+            coin.style.left = Math.random() * 100 + 'px';
+            earnCoinsBtn.appendChild(coin);
+            
+            setTimeout(() => {
+                coin.remove();
+            }, 1000);
+        }
+
+        // Update coin display
+        function updateCoinDisplay() {
+            coinCountEl.textContent = gameState.coins;
+        }
+
+        // Update item count
+        function updateItemCount() {
+            itemCountEl.textContent = gameState.inventory.length;
+        }
+
+        // Switch tabs
+        function switchTab(tabId) {
+            tabButtons.forEach(button => {
+                button.classList.remove('active', 'border-b-2', 'border-blue-400');
+            });
+            
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            document.querySelector(`.tab-btn[data-tab="${tabId}"]`).classList.add('active', 'border-b-2', 'border-blue-400');
+            document.getElementById(tabId).classList.add('active');
+            
+            if (tabId === 'inventory') {
+                renderInventory();
+            }
+        }
+
+        // Buy box function
+        function buyBox(boxType, price) {
+            if (gameState.coins < price) {
+                alert("Not enough coins!");
+                return;
+            }
+            
+            gameState.coins -= price;
+            updateCoinDisplay();
+            
+            // Show opening animation
+            openBoxModal(boxType);
+            
+            // After a delay, reveal the item
+            setTimeout(() => {
+                revealItem(boxType);
+            }, 2000);
+        }
+
+        // Open box modal
+        function openBoxModal(boxType) {
+            boxModal.classList.remove('hidden');
+            boxTitle.textContent = `Opening ${boxType.charAt(0).toUpperCase() + boxType.slice(1)} Box...`;
+            boxResult.classList.add('hidden');
+            boxRarity.classList.add('hidden');
+            boxDescription.classList.add('hidden');
+            openAnotherBtn.classList.add('hidden');
+            
+            // Set box icon based on type
+            boxAnimation.className = `w-32 h-32 mx-auto mb-6 flex items-center justify-center text-6xl box-opening box-${boxType}`;
+            
+            let icon;
+            switch(boxType) {
+                case 'common': icon = 'fa-box'; break;
+                case 'rare': icon = 'fa-gem'; break;
+                case 'epic': icon = 'fa-star'; break;
+                case 'legendary': icon = 'fa-crown'; break;
+                case 'cursed': icon = 'fa-skull'; break;
+                case 'rainbow': icon = 'fa-rainbow'; break;
+                case 'hacker': icon = 'fa-terminal'; break;
+                default: icon = 'fa-box';
+            }
+            
+            boxAnimation.innerHTML = `<i class="fas ${icon}"></i>`;
+            
+            // Play box opening sound
+            boxOpenSound.currentTime = 0;
+            boxOpenSound.play();
+        }
+
+        // Close box modal
+        function closeBoxModal() {
+            boxModal.classList.add('hidden');
+        }
+
+        // Reveal item from box
+        function revealItem(boxType) {
+            const items = gameState.items[boxType];
+            const randomItem = items[Math.floor(Math.random() * items.length)];
+            
+            // Add to inventory
+            gameState.inventory.push({
+                name: randomItem.name,
+                description: randomItem.description,
+                rarity: boxType,
+                emoji: randomItem.emoji
+            });
+            
+            updateItemCount();
+            
+            // Update modal with item info
+            boxAnimation.classList.remove('box-opening');
+            boxAnimation.classList.add('reveal-animation');
+            boxAnimation.innerHTML = `<span class="text-4xl">${randomItem.emoji}</span>`;
+            
+            itemName.textContent = randomItem.name;
+            boxDescription.textContent = randomItem.description;
+            
+            // Set rarity display
+            boxRarity.textContent = `Rarity: ${boxType.charAt(0).toUpperCase() + boxType.slice(1)}`;
+            boxRarity.className = `text-lg mb-6 ${getRarityColorClass(boxType)}`;
+            
+            boxResult.classList.remove('hidden');
+            boxRarity.classList.remove('hidden');
+            boxDescription.classList.remove('hidden');
+            openAnotherBtn.classList.remove('hidden');
+            
+            // Play appropriate sound
+            playRaritySound(boxType);
+            
+            // Create sparkles
+            createSparkles();
+        }
+
+        // Get CSS class for rarity color
+        function getRarityColorClass(rarity) {
+            switch(rarity) {
+                case 'common': return 'text-gray-400';
+                case 'rare': return 'text-blue-400';
+                case 'epic': return 'text-purple-400';
+                case 'legendary': return 'text-yellow-400';
+                case 'cursed': return 'text-red-400';
+                case 'rainbow': return 'rainbow-text';
+                case 'hacker': return 'text-green-400';
+                default: return 'text-white';
+            }
+        }
+
+        // Play sound based on rarity
+        function playRaritySound(rarity) {
+            switch(rarity) {
+                case 'rare':
+                    rareSound.currentTime = 0;
+                    rareSound.play();
+                    break;
+                case 'epic':
+                    epicSound.currentTime = 0;
+                    epicSound.play();
+                    break;
+                case 'legendary':
+                    legendarySound.currentTime = 0;
+                    legendarySound.play();
+                    break;
+                case 'cursed':
+                    cursedSound.currentTime = 0;
+                    cursedSound.play();
+                    break;
+                case 'rainbow':
+                    rainbowSound.currentTime = 0;
+                    rainbowSound.play();
+                    break;
+                case 'hacker':
+                    hackerSound.currentTime = 0;
+                    hackerSound.play();
+                    break;
+                default:
+                    boxOpenSound.currentTime = 0;
+                    boxOpenSound.play();
+            }
+        }
+
+        // Create sparkle effects
+        function createSparkles() {
+            const modal = document.getElementById('boxModal');
+            
+            for (let i = 0; i < 50; i++) {
+                const sparkle = document.createElement('div');
+                sparkle.className = 'sparkle';
+                sparkle.style.left = Math.random() * 100 + '%';
+                sparkle.style.top = Math.random() * 100 + '%';
+                sparkle.style.setProperty('--tx', (Math.random() * 100 - 50) + 'px');
+                modal.appendChild(sparkle);
+                
+                setTimeout(() => {
+                    sparkle.remove();
+                }, 1000);
+            }
+        }
+
+        // Render inventory
+        function renderInventory() {
+            inventoryItemsEl.innerHTML = '';
+            
+            if (gameState.inventory.length === 0) {
+                inventoryItemsEl.innerHTML = '<p class="text-center col-span-4 text-gray-400">Your inventory is empty. Buy some boxes!</p>';
+                return;
+            }
+            
+            gameState.inventory.forEach((item, index) => {
+                const itemEl = document.createElement('div');
+                itemEl.className = 'bg-gray-800 rounded-lg p-4 inventory-item';
+                itemEl.innerHTML = `
+                    <div class="flex items-center mb-2">
+                        <span class="text-2xl mr-2">${item.emoji}</span>
+                        <h3 class="text-lg font-bold">${item.name}</h3>
+                    </div>
+                    <p class="text-sm text-gray-300 mb-2">${item.description}</p>
+                    <span class="text-xs ${getRarityColorClass(item.rarity)}">${item.rarity.charAt(0).toUpperCase() + item.rarity.slice(1)}</span>
+                `;
+                inventoryItemsEl.appendChild(itemEl);
+            });
+        }
+
+        // Initialize the game when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initGame);
+    </script>
+<p style="border-radius: 8px; text-align: center; font-size: 12px; color: #fff; margin-top: 16px;position: fixed; left: 8px; bottom: 8px; z-index: 10; background: rgba(0, 0, 0, 0.8); padding: 4px 8px;">Made with <img src="https://enzostvs-deepsite.hf.space/logo.svg" alt="DeepSite Logo" style="width: 16px; height: 16px; vertical-align: middle;display:inline-block;margin-right:3px;filter:brightness(0) invert(1);"><a href="https://enzostvs-deepsite.hf.space" style="color: #fff;text-decoration: underline;" target="_blank" >DeepSite</a> - 🧬 <a href="https://enzostvs-deepsite.hf.space?remix=sigmaohiaskiasd/cosmicloot" style="color: #fff;text-decoration: underline;" target="_blank" >Remix</a></p></body>
+</html>
